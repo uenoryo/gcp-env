@@ -2,7 +2,7 @@ package gcpenv
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/uenoryo/gcp-env/gcloud/secretmanager"
@@ -29,11 +29,23 @@ func (env *GCPEnv) Fetch(ctx context.Context) error {
 	req := &secretmanager.ListSecretsRequest{
 		ProjectName: "chitoi",
 	}
-	secrets, err := client.ListSecrets(ctx, req)
+	res, err := client.ListSecrets(ctx, req)
 	if err != nil {
 		return errors.Wrap(err, "failed to list secrets")
 	}
-	log.Println(secrets)
+
+	for _, key := range res.Keys {
+		req := &secretmanager.AccessSecretVersionRequest{
+			ProjectName: "chitoi",
+			Key:         key,
+			//			Version:     "1",
+		}
+		res, err := client.AccessSecretVersion(ctx, req)
+		if err != nil {
+			return errors.Wrapf(err, "failed to access secret. key:[%s]", key)
+		}
+		fmt.Printf("%s=%s\n", key, res.Value)
+	}
 	return nil
 }
 

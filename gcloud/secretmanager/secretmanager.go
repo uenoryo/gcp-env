@@ -89,7 +89,7 @@ func (req *AccessSecretVersionRequest) ResourceName() string {
 	if v == "" {
 		v = "latest"
 	}
-	return fmt.Sprintf("projects/%s/secret/%s/versions/%s", req.ProjectName, req.Key, v)
+	return fmt.Sprintf("projects/%s/secrets/%s/versions/%s", req.ProjectName, req.Key, v)
 }
 
 // AccessSecretVersionResponse は projects.secrets.versions のレスポンス
