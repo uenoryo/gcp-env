@@ -2,15 +2,38 @@ package main
 
 import (
 	"context"
-	"log"
+	"errors"
+	"flag"
+	"fmt"
+	"os"
 
 	"github.com/uenoryo/gcp-env/gcpenv"
 )
 
 func main() {
-	env := gcpenv.New(&gcpenv.Config{})
-	if err := env.Fetch(context.Background()); err != nil {
-		log.Println(err.Error())
+	if err := _main(); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
-	log.Println(env.Map())
+}
+
+func _main() error {
+	var (
+		ctx     = context.Background()
+		conf    = &gcpenv.Config{}
+		flagSet = flag.NewFlagSet("gcpenv", flag.ExitOnError)
+	)
+	flagSet.StringVar(&conf.ProjectName, "project", "", "プロジェクト名を指定してください")
+	flagSet.StringVar(&conf.Version, "version", "latest", "バージョンを指定してください")
+	flagSet.Parse(os.Args[1:])
+
+	if conf.ProjectName == "" {
+		return errors.New("プロジェクト名を指定してください")
+	}
+
+	env := gcpenv.New(conf)
+	if err := env.Fetch(ctx); err != nil {
+		return err
+	}
+	return nil
 }

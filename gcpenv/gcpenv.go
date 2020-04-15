@@ -2,7 +2,6 @@ package gcpenv
 
 import (
 	"context"
-	"io"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -32,7 +31,7 @@ func (env *GCPEnv) Fetch(ctx context.Context) error {
 	}
 
 	req := &secretmanager.ListSecretsRequest{
-		ProjectName: "chitoi",
+		ProjectName: env.config.ProjectName,
 	}
 	res, err := client.ListSecrets(ctx, req)
 	if err != nil {
@@ -41,9 +40,9 @@ func (env *GCPEnv) Fetch(ctx context.Context) error {
 
 	for _, key := range res.Keys {
 		req := &secretmanager.AccessSecretVersionRequest{
-			ProjectName: "chitoi",
+			ProjectName: env.config.ProjectName,
 			Key:         key,
-			Version:     "1",
+			Version:     env.config.Version,
 		}
 		res, err := client.AccessSecretVersion(ctx, req)
 		if err != nil {
@@ -51,11 +50,6 @@ func (env *GCPEnv) Fetch(ctx context.Context) error {
 		}
 		env.values.Store(key, res.Value)
 	}
-	return nil
-}
-
-// Write は環境変数を w に書き込む
-func (env *GCPEnv) Write(w io.Writer) error {
 	return nil
 }
 
@@ -74,4 +68,7 @@ func (env *GCPEnv) Map() map[string]string {
 }
 
 // Config (､´･ω･)▄︻┻┳═一
-type Config struct{}
+type Config struct {
+	ProjectName string
+	Version     string
+}
