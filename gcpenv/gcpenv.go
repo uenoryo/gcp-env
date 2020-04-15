@@ -47,7 +47,7 @@ func (env *GCPEnv) Fetch(ctx context.Context) error {
 		}
 		req := &secretmanager.AccessSecretVersionRequest{
 			ProjectName: env.config.ProjectName,
-			Key:         env.trimPrefix(key),
+			Key:         key,
 			Version:     env.config.Version,
 		}
 		res, err := client.AccessSecretVersion(ctx, req)
