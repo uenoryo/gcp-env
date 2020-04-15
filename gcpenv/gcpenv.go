@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -41,16 +42,19 @@ func (env *GCPEnv) Fetch(ctx context.Context) error {
 	}
 
 	for _, key := range res.Keys {
+		if !strings.HasPrefix(key, env.config.Prefix) {
+			continue
+		}
 		req := &secretmanager.AccessSecretVersionRequest{
 			ProjectName: env.config.ProjectName,
-			Key:         key,
+			Key:         env.trimPrefix(key),
 			Version:     env.config.Version,
 		}
 		res, err := client.AccessSecretVersion(ctx, req)
 		if err != nil {
 			return errors.Wrapf(err, "failed to access secret. key:[%s]", key)
 		}
-		env.values.Store(key, res.Value)
+		env.values.Store(env.trimPrefix(key), res.Value)
 	}
 	return nil
 }
@@ -79,8 +83,15 @@ func (env *GCPEnv) Write(w io.Writer) error {
 	return err
 }
 
+func (env *GCPEnv) trimPrefix(key string) string {
+	k := strings.TrimPrefix(key, env.config.Prefix)
+	k = strings.TrimPrefix(k, "-")
+	return k
+}
+
 // Config (､´･ω･)▄︻┻┳═一
 type Config struct {
 	ProjectName string
 	Version     string
+	Prefix      string
 }
