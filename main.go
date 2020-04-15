@@ -35,5 +35,8 @@ func _main() error {
 	if err := env.Fetch(ctx); err != nil {
 		return err
 	}
+	if err := env.Write(os.Stdout); err != nil {
+		return err
+	}
 	return nil
 }

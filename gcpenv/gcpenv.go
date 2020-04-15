@@ -2,6 +2,8 @@ package gcpenv
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -65,6 +67,16 @@ func (env *GCPEnv) Map() map[string]string {
 		return true
 	})
 	return m
+}
+
+// Write は values のデータを w に書き込む
+func (env *GCPEnv) Write(w io.Writer) error {
+	out := ""
+	for k, v := range env.Map() {
+		out += fmt.Sprintf("%s=%s\n", k, v)
+	}
+	_, err := w.Write([]byte(out))
+	return err
 }
 
 // Config (､´･ω･)▄︻┻┳═一
