@@ -12,4 +12,5 @@ func main() {
 	if err := env.Fetch(context.Background()); err != nil {
 		log.Println(err.Error())
 	}
+	log.Println(env.Map())
 }
