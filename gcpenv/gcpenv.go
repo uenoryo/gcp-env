@@ -80,7 +80,7 @@ func (env *GCPEnv) Write(w io.Writer) error {
 		format = "%s=%s\n"
 	)
 	if env.config.WithQuote {
-		format = "%s=%q\n"
+		format = "%s=\"%s\"\n"
 	}
 	for k, v := range env.Map() {
 		output += fmt.Sprintf(format, k, v)
