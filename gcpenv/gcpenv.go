@@ -75,11 +75,17 @@ func (env *GCPEnv) Map() map[string]string {
 
 // Write は values のデータを w に書き込む
 func (env *GCPEnv) Write(w io.Writer) error {
-	out := ""
-	for k, v := range env.Map() {
-		out += fmt.Sprintf("%s=%s\n", k, v)
+	var (
+		output = ""
+		format = "%s=%s\n"
+	)
+	if env.config.WithQuote {
+		format = "%s=%q\n"
 	}
-	_, err := w.Write([]byte(out))
+	for k, v := range env.Map() {
+		output += fmt.Sprintf(format, k, v)
+	}
+	_, err := w.Write([]byte(output))
 	return err
 }
 
@@ -94,4 +100,5 @@ type Config struct {
 	ProjectName string
 	Version     string
 	Prefix      string
+	WithQuote   bool
 }

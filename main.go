@@ -26,6 +26,7 @@ func _main() error {
 	flagSet.StringVar(&conf.ProjectName, "project", "", "プロジェクト名を指定してください")
 	flagSet.StringVar(&conf.Version, "version", "latest", "バージョンを指定してください")
 	flagSet.StringVar(&conf.Prefix, "prefix", "", "プレフィックスを指定してください")
+	flagSet.BoolVar(&conf.WithQuote, "q", false, "値をクオーテーションで囲んで出力します")
 	flagSet.Parse(os.Args[1:])
 
 	if conf.ProjectName == "" {
